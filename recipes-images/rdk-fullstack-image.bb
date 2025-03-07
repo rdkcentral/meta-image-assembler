@@ -5,8 +5,6 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 IMAGE_LINGUAS = " "
 
-DEPENDS += "nss-native"
-
 IMAGE_INSTALL = " \
                  packagegroup-vendor-layer \
                  packagegroup-middleware-layer \
