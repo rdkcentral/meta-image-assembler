@@ -5,6 +5,8 @@ FILESEXTRAPATHS:prepend := "${THISDIR}/files:"
 
 IMAGE_LINGUAS = " "
 
+DEPENDS += "nss-native"
+
 IMAGE_INSTALL = " \
                  packagegroup-vendor-layer \
                  packagegroup-middleware-layer \
@@ -31,10 +33,8 @@ create_init_link() {
 
 # Required for NetworkManager
 create_NM_link() {
-        if ${@bb.utils.contains("DISTRO_FEATURES", "ENABLE_NETWORKMANAGER", "true", "false", d)}; then
-            ln -sf /var/run/NetworkManager/no-stub-resolv.conf ${IMAGE_ROOTFS}/etc/resolv.dnsmasq
-            ln -sf /var/run/NetworkManager/resolv.conf ${IMAGE_ROOTFS}/etc/resolv.conf
-        fi
+    ln -sf /var/run/NetworkManager/no-stub-resolv.conf ${IMAGE_ROOTFS}/etc/resolv.dnsmasq
+    ln -sf /var/run/NetworkManager/resolv.conf ${IMAGE_ROOTFS}/etc/resolv.conf
 }
 
 # If vendor layer provides dobby configuration, then remove the generic config
