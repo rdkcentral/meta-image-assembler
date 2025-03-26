@@ -267,3 +267,6 @@ CONF_VERSION = "1"
 
 # LAYER_NAME not applicable for fullstack builds
 LAYER_NAME = ""
+PREFERRED_VERSION_openssl:kirkstone = "3.0.%"
+PREFERRED_VERSION_openssl-native:kirkstone = "3.0.%"
+PREFERRED_VERSION_nativesdk-openssl:kirkstone = "3.0.%"
