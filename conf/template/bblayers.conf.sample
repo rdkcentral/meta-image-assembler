@@ -28,6 +28,7 @@ BBLAYERS =+ "${@'${MANIFEST_PATH_RDK_IMAGES}' if os.path.isfile('${MANIFEST_PATH
 BBLAYERS =+ "${@'${MANIFEST_PATH_CSPC_IMAGES}' if os.path.isfile('${MANIFEST_PATH_CSPC_IMAGES}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_VENDOR_RELEASE}' if os.path.isfile('${MANIFEST_PATH_VENDOR_RELEASE}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_CSPC_SECURITY_RELEASE}' if os.path.isfile('${MANIFEST_PATH_CSPC_SECURITY_RELEASE}/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@'${MANIFEST_PATH_CSPC_RESTRICTED_APPS}' if os.path.isfile('${MANIFEST_PATH_CSPC_RESTRICTED_APPS}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_APPLICATION_RELEASE}' if os.path.isfile('${MANIFEST_PATH_APPLICATION_RELEASE}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_MW_RELEASE}' if os.path.isfile('${MANIFEST_PATH_MW_RELEASE}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_PRODUCT_LAYER}' if os.path.isfile('${MANIFEST_PATH_PRODUCT_LAYER}/conf/layer.conf') else ''}"
