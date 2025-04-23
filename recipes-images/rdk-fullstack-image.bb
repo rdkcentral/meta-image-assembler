@@ -14,7 +14,7 @@ IMAGE_INSTALL = " \
                  "
 
 IMAGE_FSTYPES += "ext4"
-#IMAGE_INSTALL += "volatile-binds"
+IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL:remove = "linux-meson"
 
 inherit core-image custom-rootfs-creation
