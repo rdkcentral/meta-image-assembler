@@ -13,7 +13,7 @@ IMAGE_INSTALL = " \
                  packagegroup-application-layer \
                  "
 
-IMAGE_FSTYPES += "ext4"
+IMAGE_FSTYPES += "ext4 tar.gz"
 IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL:remove = "linux-meson"
 
