@@ -35,6 +35,7 @@ create_init_link() {
 create_NM_link() {
     ln -sf /var/run/NetworkManager/no-stub-resolv.conf ${IMAGE_ROOTFS}/etc/resolv.dnsmasq
     ln -sf /var/run/NetworkManager/resolv.conf ${IMAGE_ROOTFS}/etc/resolv.conf
+    sed -i '/ExecStartPost=\/bin\/sh \/lib\/rdk\/NM_restartConn.sh/d' ${IMAGE_ROOTFS}/lib/systemd/system/NetworkManager.service
 }
 
 # If vendor layer provides dobby configuration, then remove the generic config
