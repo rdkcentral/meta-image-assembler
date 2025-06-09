@@ -23,18 +23,11 @@ IMAGE_ROOTFS_SIZE ?= "8192"
 IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
 
 ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
-ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
 ROOTFS_POSTPROCESS_COMMAND += "wpeframework_binding_patch; "
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
-}
-
-# Required for NetworkManager
-create_NM_link() {
-    ln -sf /var/run/NetworkManager/no-stub-resolv.conf ${IMAGE_ROOTFS}/etc/resolv.dnsmasq
-    ln -sf /var/run/NetworkManager/resolv.conf ${IMAGE_ROOTFS}/etc/resolv.conf
 }
 
 # If vendor layer provides dobby configuration, then remove the generic config
