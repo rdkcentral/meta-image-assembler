@@ -33,8 +33,11 @@ create_init_link() {
 
 # Required for NetworkManager
 create_NM_link() {
-    ln -sf /var/run/NetworkManager/no-stub-resolv.conf ${IMAGE_ROOTFS}/etc/resolv.dnsmasq
-    ln -sf /var/run/NetworkManager/resolv.conf ${IMAGE_ROOTFS}/etc/resolv.conf
+    touch ${R}/etc/resolv.conf
+    echo "nameserver 127.0.0.1" > ${R}/etc/resolv.conf
+    echo "options timeout:1" >> ${R}/etc/resolv.conf
+    echo "options attempts:2" >> ${R}/etc/resolv.conf
+    ln -sf /var/run/NetworkManager/no-stub-resolv.conf ${R}/etc/resolv.dnsmasq
 }
 
 # If vendor layer provides dobby configuration, then remove the generic config
