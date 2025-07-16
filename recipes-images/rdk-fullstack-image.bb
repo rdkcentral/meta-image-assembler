@@ -15,6 +15,7 @@ IMAGE_INSTALL = " \
 
 IMAGE_FSTYPES += "ext4 tar.gz"
 IMAGE_INSTALL += "volatile-binds"
+IMAGE_INSTALL += "${@bb.utils.contains('BUILD_VARIANT', 'debug', "systemd-analyze ", "", d)}"
 IMAGE_INSTALL:remove = "linux-meson"
 
 inherit core-image custom-rootfs-creation
