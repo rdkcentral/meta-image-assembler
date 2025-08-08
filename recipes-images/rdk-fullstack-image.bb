@@ -17,7 +17,7 @@ IMAGE_FSTYPES += "ext4 tar.gz"
 IMAGE_INSTALL += "volatile-binds "
 IMAGE_INSTALL:remove = "linux-meson"
 
-IMAGE_INSTALL += "nettle-file-sexp-conv "
+IMAGE_INSTALL += "nettle-extras "
 
 inherit core-image custom-rootfs-creation
 
