@@ -6,6 +6,8 @@ LCONF_VERSION = "6"
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
 RDKROOT := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../..')}"
+BB_ENV_EXTRAWHITE += "MW_LAYER_BUILD_TYPE"
+MW_LAYER_BUILD_TYPE ?= "MW_FEED"
 include manifest_vars.conf
 
 BBLAYERS ?= " \
@@ -29,11 +31,35 @@ BBLAYERS =+ "${@'${MANIFEST_PATH_CSPC_IMAGES}' if os.path.isfile('${MANIFEST_PAT
 BBLAYERS =+ "${@'${MANIFEST_PATH_VENDOR_RELEASE}' if os.path.isfile('${MANIFEST_PATH_VENDOR_RELEASE}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_CSPC_SECURITY_RELEASE}' if os.path.isfile('${MANIFEST_PATH_CSPC_SECURITY_RELEASE}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_APPLICATION_RELEASE}' if os.path.isfile('${MANIFEST_PATH_APPLICATION_RELEASE}/conf/layer.conf') else ''}"
-BBLAYERS =+ "${@'${MANIFEST_PATH_MW_RELEASE}' if os.path.isfile('${MANIFEST_PATH_MW_RELEASE}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_PRODUCT_LAYER}' if os.path.isfile('${MANIFEST_PATH_PRODUCT_LAYER}/conf/layer.conf') else ''}"
 
 # Config layers
 BBLAYERS =+ "${@'${MANIFEST_PATH_COMMON_CONFIG}' if os.path.isfile('${MANIFEST_PATH_COMMON_CONFIG}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_REGION_CONFIG}' if os.path.isfile('${MANIFEST_PATH_REGION_CONFIG}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_PROFILE_CONFIG}' if os.path.isfile('${MANIFEST_PATH_PROFILE_CONFIG}/conf/layer.conf') else ''}"
+
+#Middleware release feed
+#BBLAYERS =+ "${@'${MANIFEST_PATH_MW_RELEASE}' if os.path.isfile('${MANIFEST_PATH_MW_RELEASE}/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MW_RELEASE') if d.getVar('MW_LAYER_BUILD_TYPE') != 'MW_DEV' and d.getVar('MANIFEST_PATH_MW_RELEASE') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MW_RELEASE') + '/conf/layer.conf')  else ''}"
+
+#Middleware development layer - cspc
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MIDDLEWARE_DEV') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_MIDDLEWARE_DEV') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MIDDLEWARE_DEV') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_RDK_COMCAST') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_COMCAST') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_COMCAST') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_COMCAST_VIDEO') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_COMCAST_VIDEO') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_COMCAST_VIDEO') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_META_QT5') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_META_QT5') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_META_QT5') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_COMCAST_VOICE_SDK') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_COMCAST_VOICE_SDK') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_COMCAST_VOICE_SDK') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MEDIARITE') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_MEDIARITE') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MEDIARITE') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_RDK_SKY') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_SKY') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_SKY') + '/conf/layer.conf')  else ''}"
+#Middleware development layer - restricted
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MIDDLEWARE_DEV_RESTRICTED') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_MIDDLEWARE_DEV_RESTRICTED') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MIDDLEWARE_DEV_RESTRICTED') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_RDK_RESTRICTED') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_RESTRICTED') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_RESTRICTED') + '/conf/layer.conf')  else ''}"
+#Middleware development layer - generic
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MIDDLEWARE_DEV_GENERIC') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_MIDDLEWARE_DEV_GENERIC') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MIDDLEWARE_DEV_GENERIC') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_META_RDK') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_META_RDK') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_META_RDK') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_RDK_VIDEO') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_VIDEO') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_VIDEO') + '/conf/layer.conf')  else ''}"
+#Middleware development layer - halif headers
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_RDK_HALIF_HEADERS') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_HALIF_HEADERS') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_HALIF_HEADERS') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_RDK_CPC_HALIF_HEADERS') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_CPC_HALIF_HEADERS') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_CPC_HALIF_HEADERS') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_META_RUST') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_META_RUST') is not None and  os.path.isfile(d.getVar('MANIFEST_META_RUST') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_META_PYTHON2') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_META_PYTHON2') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_META_PYTHON2') + '/conf/layer.conf')  else ''}"
 
