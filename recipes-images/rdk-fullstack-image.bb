@@ -29,7 +29,7 @@ ROOTFS_POSTPROCESS_COMMAND += "wpeframework_binding_patch; "
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
-        sed -i '/^After=/ s/\bapparmor\.service\b *//g' ${D}${systemd_unitdir}/system
+        sed -i '/^After=/ s/\bapparmor\.service\b *//g' ${D}${systemd_unitdir}/system/syslog-ng.service
 }
 
 # Required for NetworkManager
