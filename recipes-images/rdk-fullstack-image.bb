@@ -29,6 +29,7 @@ ROOTFS_POSTPROCESS_COMMAND += "wpeframework_binding_patch; "
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
+        rm -rf ${D}${systemd_system_unitdir}/apparmor.service
 }
 
 # Required for NetworkManager
