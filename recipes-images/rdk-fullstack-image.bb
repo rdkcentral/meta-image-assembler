@@ -18,6 +18,7 @@ IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL:remove = "linux-meson"
 
 inherit core-image custom-rootfs-creation
+inherit apparmor_binprofiles
 
 IMAGE_ROOTFS_SIZE ?= "8192"
 IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
