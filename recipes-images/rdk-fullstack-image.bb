@@ -29,6 +29,8 @@ ROOTFS_POSTPROCESS_COMMAND += "wpeframework_binding_patch; "
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
+        sed -i 's/^RuntimeMaxFileSize=.*/RuntimeMaxFileSize=9M/' ${IMAGE_ROOTFS}/${sysconfdir}/systemd/journald.conf
+        sed -i 's/^RuntimeMaxUse=.*/RuntimeMaxUse=9M/' ${IMAGE_ROOTFS}/${sysconfdir}/systemd/journald.conf  
 }
 
 # Required for NetworkManager
