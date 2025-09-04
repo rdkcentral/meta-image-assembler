@@ -29,6 +29,7 @@ ROOTFS_POSTPROCESS_COMMAND += "wpeframework_binding_patch; "
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
+        sed -i 's/\b\(syslog-ng\.service\)\b//g; s/  */ /g; s/Before= /Before=/' ${IMAGE_ROOTFS}/${systemd_system_unitdir}/apparmor.service.d/apparmor.conf  
 }
 
 # Required for NetworkManager
