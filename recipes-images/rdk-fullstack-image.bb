@@ -15,6 +15,9 @@ IMAGE_INSTALL = " \
 
 IMAGE_FSTYPES += "ext4 tar.gz"
 IMAGE_INSTALL += "volatile-binds"
+IMAGE_INSTALL += "systemd-analyze"
+IMAGE_INSTALL += "tcpdump"
+
 IMAGE_INSTALL:remove = "linux-meson"
 
 inherit core-image custom-rootfs-creation
