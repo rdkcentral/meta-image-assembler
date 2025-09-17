@@ -6,7 +6,7 @@ LCONF_VERSION = "6"
 BBPATH = "${TOPDIR}"
 BBFILES ?= ""
 RDKROOT := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../..')}"
-MW_LAYER_BUILD_TYPE ?= "MW_FEED"
+MW_LAYER_BUILD_TYPE ?= "MW_DEV"
 include manifest_vars.conf
 
 BBLAYERS ?= " \
