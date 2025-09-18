@@ -21,7 +21,7 @@ BBLAYERS ?= " \
   "
 
 BBLAYERS =+ "${@'${MANIFEST_PATH_COMMON_OSS_REFERENCE}' if os.path.isfile('${MANIFEST_PATH_COMMON_OSS_REFERENCE}/conf/layer.conf') else ''}"
-BBLAYERS =+ "${@'${MANIFEST_PATH_OSS_RELEASE}' if os.path.isfile('${MANIFEST_PATH_OSS_RELEASE}/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_OSS_RELEASE') if d.getVar('MANIFEST_PATH_OSS_RELEASE') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_OSS_RELEASE') + '/conf/layer.conf') else ''}"
 
 BBLAYERS =+ "${@'${MANIFEST_PATH_RDK_TOOLS}' if os.path.isfile('${MANIFEST_PATH_RDK_TOOLS}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_RDK_IMAGES}' if os.path.isfile('${MANIFEST_PATH_RDK_IMAGES}/conf/layer.conf') else ''}"
