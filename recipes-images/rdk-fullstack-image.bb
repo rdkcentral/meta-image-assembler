@@ -11,6 +11,7 @@ IMAGE_INSTALL = " \
                  packagegroup-vendor-layer \
                  packagegroup-middleware-layer \
                  packagegroup-application-layer \
+                 migration \
                  "
 
 IMAGE_FSTYPES += "ext4 tar.gz"

@@ -37,3 +37,5 @@ BBLAYERS =+ "${@'${MANIFEST_PATH_COMMON_CONFIG}' if os.path.isfile('${MANIFEST_P
 BBLAYERS =+ "${@'${MANIFEST_PATH_REGION_CONFIG}' if os.path.isfile('${MANIFEST_PATH_REGION_CONFIG}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_PROFILE_CONFIG}' if os.path.isfile('${MANIFEST_PATH_PROFILE_CONFIG}/conf/layer.conf') else ''}"
 
+# Xumotv product 
+BBLAYERS =+ "${@'${MANIFEST_PATH_PRODUCT_XUMOTV_LAYER}' if os.path.isfile('${MANIFEST_PATH_PRODUCT_XUMOTV_LAYER}/conf/layer.conf') else ''}"
