@@ -22,7 +22,7 @@ BBLAYERS ?= " \
   "
 
 BBLAYERS =+ "${@'${MANIFEST_PATH_COMMON_OSS_REFERENCE}' if os.path.isfile('${MANIFEST_PATH_COMMON_OSS_REFERENCE}/conf/layer.conf') else ''}"
-BBLAYERS =+ "${@'${MANIFEST_PATH_OSS_RELEASE}' if os.path.isfile('${MANIFEST_PATH_OSS_RELEASE}/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_OSS_RELEASE') if d.getVar('MANIFEST_PATH_OSS_RELEASE') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_OSS_RELEASE') + '/conf/layer.conf') else ''}"
 
 BBLAYERS =+ "${@'${MANIFEST_PATH_RDK_TOOLS}' if os.path.isfile('${MANIFEST_PATH_RDK_TOOLS}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_RDK_IMAGES}' if os.path.isfile('${MANIFEST_PATH_RDK_IMAGES}/conf/layer.conf') else ''}"
@@ -36,6 +36,7 @@ BBLAYERS =+ "${@'${MANIFEST_PATH_PRODUCT_LAYER}' if os.path.isfile('${MANIFEST_P
 BBLAYERS =+ "${@'${MANIFEST_PATH_COMMON_CONFIG}' if os.path.isfile('${MANIFEST_PATH_COMMON_CONFIG}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_REGION_CONFIG}' if os.path.isfile('${MANIFEST_PATH_REGION_CONFIG}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_PROFILE_CONFIG}' if os.path.isfile('${MANIFEST_PATH_PROFILE_CONFIG}/conf/layer.conf') else ''}"
+
 
 #Middleware release feed
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MW_RELEASE') if d.getVar('MW_LAYER_BUILD_TYPE') != 'MW_DEV' and d.getVar('MANIFEST_PATH_MW_RELEASE') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MW_RELEASE') + '/conf/layer.conf')  else ''}"
@@ -64,3 +65,6 @@ BBLAYERS =+ " \
        ${@d.getVar('MANIFEST_PATH_MEDIARITE') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_MEDIARITE') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MEDIARITE') + '/conf/layer.conf')  else ''} \
        ${@d.getVar('MANIFEST_PATH_RDK_CPC_HALIF_HEADERS') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_CPC_HALIF_HEADERS') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_CPC_HALIF_HEADERS') + '/conf/layer.conf')  else ''} \
        "
+
+# xumotv product layer
+BBLAYERS =+ "${@'${MANIFEST_PATH_PRODUCT_XUMOTV_LAYER}' if os.path.isfile('${MANIFEST_PATH_PRODUCT_XUMOTV_LAYER}/conf/layer.conf') else ''}"
