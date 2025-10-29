@@ -273,10 +273,10 @@ LAYER_NAME = ""
 BB_DANGLINGAPPENDS_WARNONLY = "true"
 
 SSTATE_MIRRORS = "\
-        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/rdktv-us-armv7a/middleware/PATH;downloadfilename=PATH \n \
-        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/rdktv-us-armv7a/vendor/PATH;downloadfilename=PATH \n \
-        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/rdktv-us-armv7a/application/PATH;downloadfilename=PATH \n \
-        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/rdktv-us-armv7a/assembler/PATH;downloadfilename=PATH \n \
-        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/rdktv-us-armv7a/oss/PATH;downloadfilename=PATH \n \
+        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/${MACHINE}/middleware/PATH;downloadfilename=PATH \n \
+        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/${MACHINE}/vendor/PATH;downloadfilename=PATH \n \
+        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/${MACHINE}/application/PATH;downloadfilename=PATH \n \
+        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/${MACHINE}/assembler/PATH;downloadfilename=PATH \n \
+        file://.* http://rdksstate-e.stb.r53.xcal.tv/artifact/${MACHINE}/oss/PATH;downloadfilename=PATH \n \
         file://.* http://sstate.yoctoproject.org/all/PATH;downloadfilename=PATH \n \
         "
