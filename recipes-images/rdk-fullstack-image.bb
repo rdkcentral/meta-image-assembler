@@ -54,4 +54,3 @@ dobby_generic_config_patch(){
 wpeframework_binding_patch(){
     sed -i "s/127.0.0.1/0.0.0.0/g" ${IMAGE_ROOTFS}/etc/WPEFramework/config.json
 }
-SKIP_RECIPE_IPK_PKGS ="1"
