@@ -244,6 +244,7 @@ BUILDHISTORY_COMMIT = "1"
 
 DISTRO_CODENAME = "##DISTRO_CODENAME##"
 DISTRO_FEATURES += "##DISTRO_CODENAME##"
+MW_LAYER_BUILD_TYPE = "##MW_LAYER_BUILD_TYPE##"
 
 #require conf/distro/include/##RDK_FLAVOR##.inc
 
@@ -254,7 +255,7 @@ BB_SRCREV_POLICY ??= "cache"
 # CONF_VERSION is increased each time build/conf/ changes incompatibly and is used to
 # track the version of this file when it was generated. This can safely be ignored if
 # this doesn't mean anything to you.
-CONF_VERSION = "2"
+CONF_VERSION = "${@oe.utils.conditional('MW_LAYER_BUILD_TYPE', 'MW_DEV', '1', '2', d)}"
 
 #
 # Debugging Tools
