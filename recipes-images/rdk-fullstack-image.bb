@@ -26,9 +26,20 @@ ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
 ROOTFS_POSTPROCESS_COMMAND += "wpeframework_binding_patch; "
+ROOTFS_POSTPROCESS_COMMAND += "enable_mosquitto_connection; "
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
+}
+
+# Required for mosquitto connection
+enable_mosquitto_connection() {
+    if ${@bb.utils.contains("DISTRO_FEATURES", "enable_dab", "true", "false", d)}; then
+    sed -i \
+            -e '/^# listener port-number/{n;s|.*|listener 1883|}' \
+            -e 's|^#allow_anonymous[[:space:]]\+false|allow_anonymous true|' \
+            ${IMAGE_ROOTFS}/etc/mosquitto/mosquitto.conf
+    fi
 }
 
 # Required for NetworkManager
