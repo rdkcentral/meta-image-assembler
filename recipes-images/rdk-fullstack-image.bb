@@ -21,6 +21,7 @@ inherit core-image custom-rootfs-creation
 
 IMAGE_ROOTFS_SIZE ?= "8192"
 IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
+IMAGE_INSTALL:append = " systemd-analyze"
 
 ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
@@ -29,6 +30,7 @@ ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-va
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
+        sed -i 's/\b\(syslog-ng\.service\)\b//g; s/  */ /g; s/Before= /Before=/' ${IMAGE_ROOTFS}/${systemd_system_unitdir}/apparmor.service.d/apparmor.conf  
 }
 
 # Required for NetworkManager
