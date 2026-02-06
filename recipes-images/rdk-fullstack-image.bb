@@ -29,6 +29,7 @@ ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-va
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
+        sed -i '/^After=/ s/\bapparmor\.service\b *//g' ${IMAGE_ROOTFS}/${systemd_unitdir}/system/syslog-ng.service
 }
 
 # Required for NetworkManager
