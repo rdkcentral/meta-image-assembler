@@ -181,6 +181,17 @@ wpeframework_binding_patch(){
     sed -i "s/127.0.0.1/0.0.0.0/g" ${IMAGE_ROOTFS}/etc/WPEFramework/config.json
 }
 
+# Validate file pattern to prevent command injection
+validate_file_pattern() {
+    local pattern="$1"
+    # Allow only safe characters: alphanumeric, forward slash, asterisk, dot, dash, underscore
+    # This prevents command substitution (e.g., $(command), `command`) and other shell metacharacters
+    if printf '%s\n' "$pattern" | grep -qE '[^a-zA-Z0-9/_.*-]'; then
+        return 1
+    fi
+    return 0
+}
+
 # Remove files from installed packages based on DISTRO_FEATURES
 remove_feature_filtered_files() {
     bbnote "=== Starting feature-based file removal ==="
@@ -195,6 +206,12 @@ remove_feature_filtered_files() {
     
     for file_pattern in ${MIDDLEWARE_FILES_TO_REMOVE}; do
         bbnote "Processing pattern: $file_pattern"
+        
+        # Validate pattern to prevent command injection
+        if ! validate_file_pattern "$file_pattern"; then
+            bbwarn "Skipping invalid file pattern (contains unsafe characters): $file_pattern"
+            continue
+        fi
         
         # Use find with wildcards to handle glob patterns
         if echo "$file_pattern" | grep -q '\*'; then
