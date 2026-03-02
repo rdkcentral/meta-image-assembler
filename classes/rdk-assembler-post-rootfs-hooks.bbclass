@@ -128,8 +128,8 @@ validate_package_filtering() {
     local validation_failed=false
     
     for pkg in ${MIDDLEWARE_PACKAGES_TO_EXCLUDE}; do
-        # Check if package is listed in opkg status
-        if grep -q "^Package: $pkg$" "$status_file" 2>/dev/null; then
+        # Check if package is listed in opkg status (use fixed-string grep to avoid regex issues)
+        if grep -qF "Package: $pkg" "$status_file" 2>/dev/null; then
             installed_excluded="$installed_excluded $pkg"
             validation_failed=true
         fi
