@@ -186,7 +186,7 @@ validate_file_pattern() {
     local pattern="$1"
     # Allow only safe characters: alphanumeric, forward slash, asterisk, dot, dash, underscore
     # This prevents command substitution (e.g., $(command), `command`) and other shell metacharacters
-    if echo "$pattern" | grep -qE '[^a-zA-Z0-9/_.*-]'; then
+    if printf '%s\n' "$pattern" | grep -qE '[^a-zA-Z0-9/_.*-]'; then
         return 1
     fi
     return 0
