@@ -68,9 +68,5 @@ wpeframework_binding_patch(){
 update_default_ntp_server() {
     CONF="${R}/etc/systemd/timesyncd.conf"
     # Replace any (commented or not) FallbackNTP line, or append if missing
-    if grep -qE '^[#]*FallbackNTP=' "$CONF"; then
-        sed -i 's|^[#]*FallbackNTP=.*|FallbackNTP=global-bootstrap-time1.xfinity.com global-bootstrap-time2.xfinity.com|' "$CONF"
-    else
-        echo 'FallbackNTP=global-bootstrap-time1.xfinity.com global-bootstrap-time2.xfinity.com' >> "$CONF"
-    fi
+     sed -i -e 's/^NTP=.*/NTP=global-bootstrap-time1.xfinity.com global-bootstrap-time2.xfinity.com/g' "$CONF"
 }
