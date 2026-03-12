@@ -26,6 +26,7 @@ ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-variant', 'wpeframework_binding_patch; ', '', d)}"
+ROOTFS_POSTPROCESS_COMMAND += "update_default_ntp_server; "
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
@@ -62,4 +63,8 @@ dobby_generic_config_patch(){
 
 wpeframework_binding_patch(){
     sed -i "s/127.0.0.1/0.0.0.0/g" ${IMAGE_ROOTFS}/etc/WPEFramework/config.json
+}
+
+update_default_ntp_server(){
+     sed -i 's|^#FallbackNTP=.*|FallbackNTP=global-bootstrap-time1.xfinity.com global-bootstrap-time2.xfinity.com|' ${R}/etc/systemd/timesyncd.conf
 }
