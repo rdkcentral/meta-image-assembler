@@ -58,4 +58,5 @@ wpeframework_binding_patch(){
 
 remove_want_dep(){
   sed -i "/Wants=multi-user.target/d" ${IMAGE_ROOTFS}/lib/systemd/system/afw_license_check.service
+  sed -i "/After=network.target/d" ${IMAGE_ROOTFS}/lib/systemd/system/redis.service
 }
