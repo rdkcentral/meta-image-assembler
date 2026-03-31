@@ -25,6 +25,7 @@ IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "syst
 ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
+ROOTFS_POSTPROCESS_COMMAND += "remove_want_dep; "
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-variant', 'wpeframework_binding_patch; ', '', d)}"
 
 create_init_link() {
@@ -53,4 +54,8 @@ dobby_generic_config_patch(){
 
 wpeframework_binding_patch(){
     sed -i "s/127.0.0.1/0.0.0.0/g" ${IMAGE_ROOTFS}/etc/WPEFramework/config.json
+}
+
+remove_want_dep(){
+  sed -i "/Wants=multi-user.target/d" ${IMAGE_ROOTFS}/lib/systemd/system/afw_license_check.service
 }
