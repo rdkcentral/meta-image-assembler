@@ -57,5 +57,7 @@ wpeframework_binding_patch(){
 }
 
 remove_want_dep(){
-  sed -i "/After=network.target/d" ${IMAGE_ROOTFS}/lib/systemd/system/redis.service
+  sed -i "s|ExecStart=/bin/sh -c '/usr/bin/sysMgrMain'|ExecStart=/usr/bin/sysMgrMain|" /opt/sysmgr.service
+  sed -i "s|ExecStart=/bin/sh -c '/usr/bin/mfrMgrMain'|ExecStart=/usr/bin/mfrMgrMain|" /opt/mfrmgr.service
+  sed -i "s|ExecStart=/bin/sh -c '/usr/bin/dsMgrMain'|ExecStart=/usr/bin/dsMgrMain|" /opt/dsmgr.service
 }
