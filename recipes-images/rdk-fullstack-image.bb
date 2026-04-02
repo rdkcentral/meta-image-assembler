@@ -57,5 +57,6 @@ wpeframework_binding_patch(){
 }
 
 remove_want_dep(){
-  sed -i "/After=network.target/d" ${IMAGE_ROOTFS}/lib/systemd/system/redis.service
+  sed -i 's/ iarmbusd\.service//' ${IMAGE_ROOTFS}/lib/systemd/system/rtk-audio.service
+  sed -i 's/ iarmbusd\.service//' ${IMAGE_ROOTFS}/lib/systemd/system/rtk-resource-manager.service
 }
