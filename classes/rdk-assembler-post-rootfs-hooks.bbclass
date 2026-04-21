@@ -3,7 +3,6 @@
 
 # Include feature-based filtering configuration
 require ../conf/middleware-feature-mapping.conf
-require ../conf/middleware-file-filter.conf
 
 # Middleware Package Filtering - determines which packages to exclude based on DISTRO_FEATURES
 python () {
@@ -48,58 +47,12 @@ python () {
         bb.note('=== No packages to exclude ===')
 }
 
-# Middleware File Filtering - determines which files to remove from rootfs
-python () {
-    """
-    Determine which files should be removed from rootfs based on missing DISTRO_FEATURES
-    """
-    import bb
-    
-    distro_features = set((d.getVar('DISTRO_FEATURES') or '').split())
-    available_features = (d.getVar('MIDDLEWARE_FILE_FILTER_FEATURES') or '').split()
-    
-    bb.note('=== Middleware File Filtering ===')
-    bb.note('Available file filter features: %s' % ', '.join(available_features))
-    bb.note('Current DISTRO_FEATURES: %s' % ' '.join(sorted(distro_features)))
-    
-    files_to_remove = []
-    
-    for feature in available_features:
-        required_distro_feature = d.getVar('MIDDLEWARE_FILE_FILTER_' + feature)
-        feature_files = d.getVar('MIDDLEWARE_FILE_FILTER_' + feature + '_FILES')
-        
-        if not required_distro_feature or not feature_files:
-            bb.note('Skipping file filter "%s" - no configuration found' % feature)
-            continue
-        
-        file_patterns = feature_files.split()
-        
-        if required_distro_feature in distro_features:
-            bb.note('✓ File filter "%s" KEEPING files (DISTRO_FEATURE "%s" present)' % 
-                   (feature, required_distro_feature))
-        else:
-            patterns_preview = ', '.join(file_patterns[:3]) + ('...' if len(file_patterns) > 3 else '')
-            bb.note('✗ File filter "%s" REMOVING files (DISTRO_FEATURE "%s" missing): %s' % 
-                   (feature, required_distro_feature, patterns_preview))
-            files_to_remove.extend(file_patterns)
-    
-    files_str = ' '.join(files_to_remove)
-    d.setVar('MIDDLEWARE_FILES_TO_REMOVE', files_str)
-    
-    if files_to_remove:
-        bb.note('=== Files marked for removal: %d patterns ===' % len(files_to_remove))
-        bb.note('=== File patterns: %s ===' % (', '.join(files_to_remove[:5]) + ('...' if len(files_to_remove) > 5 else '')))
-    else:
-        bb.note('=== No files to remove ===')
-}
-
 # Register all post-process commands
 ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-variant', 'wpeframework_binding_patch; ', '', d)}"
 ROOTFS_POSTPROCESS_COMMAND += "validate_package_filtering; "
-ROOTFS_POSTPROCESS_COMMAND += "remove_feature_filtered_files; "
 
 # Validate that package filtering worked correctly
 validate_package_filtering() {
@@ -179,49 +132,4 @@ dobby_generic_config_patch(){
 
 wpeframework_binding_patch(){
     sed -i "s/127.0.0.1/0.0.0.0/g" ${IMAGE_ROOTFS}/etc/WPEFramework/config.json
-}
-
-# Remove files from installed packages based on DISTRO_FEATURES
-remove_feature_filtered_files() {
-    bbnote "=== Starting feature-based file removal ==="
-    bbnote "MIDDLEWARE_FILES_TO_REMOVE: '${MIDDLEWARE_FILES_TO_REMOVE}'"
-    
-    if [ -z "${MIDDLEWARE_FILES_TO_REMOVE}" ]; then
-        bbnote "No files to remove (MIDDLEWARE_FILES_TO_REMOVE is empty)"
-        return 0
-    fi
-    
-    bbnote "Files to remove: ${MIDDLEWARE_FILES_TO_REMOVE}"
-    
-    for file_pattern in ${MIDDLEWARE_FILES_TO_REMOVE}; do
-        bbnote "Processing pattern: $file_pattern"
-        
-        # Use find with wildcards to handle glob patterns
-        if echo "$file_pattern" | grep -q '\*'; then
-            # Pattern contains wildcard, use find
-            found_files=$(find ${IMAGE_ROOTFS} -path "${IMAGE_ROOTFS}$file_pattern" 2>/dev/null || true)
-            if [ -n "$found_files" ]; then
-                find ${IMAGE_ROOTFS} -path "${IMAGE_ROOTFS}$file_pattern" -exec rm -f {} \; 2>/dev/null || true
-                bbnote "  Removed files matching: $file_pattern"
-            else
-                bbnote "  No files found matching: $file_pattern"
-            fi
-        else
-            # Exact path
-            if [ -e "${IMAGE_ROOTFS}$file_pattern" ] || [ -L "${IMAGE_ROOTFS}$file_pattern" ]; then
-                rm -rf "${IMAGE_ROOTFS}$file_pattern"
-                bbnote "  Removed: $file_pattern"
-            else
-                bbnote "  File not found: $file_pattern"
-            fi
-        fi
-    done
-    
-    # Remove empty directories
-    bbnote "Cleaning up empty directories..."
-    find ${IMAGE_ROOTFS}/usr/share/WPEFramework -type d -empty -delete 2>/dev/null || true
-    find ${IMAGE_ROOTFS}/etc/WPEFramework -type d -empty -delete 2>/dev/null || true
-    find ${IMAGE_ROOTFS}/usr/lib/wpeframework -type d -empty -delete 2>/dev/null || true
-    
-    bbnote "=== Feature-filtered file removal complete ==="
 }

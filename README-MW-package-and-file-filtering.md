@@ -1,13 +1,12 @@
-# Middleware Feature and File Filtering
+# Middleware Feature Filtering
 
 This document explains the feature-based filtering system for middleware components in RDK image assembler builds.
 
 ## Overview
 
-The filtering system provides two levels of control for middleware components based on `DISTRO_FEATURES`:
+The filtering system controls which middleware IPK packages are installed based on `DISTRO_FEATURES`:
 
-1. **Package-Level Filtering**: Prevents entire IPK packages from being installed
-2. **File-Level Filtering**: Removes specific files from installed packages during rootfs creation
+- **Package-Level Filtering**: Prevents entire IPK packages from being installed
 
 ## Architecture
 
@@ -25,15 +24,9 @@ DISTRO_FEATURES (product.inc)
 │  └──────────────────────────────────────┘          │
 │                                                     │
 │  ┌──────────────────────────────────────┐          │
-│  │ File Filtering (Parse Time)          │          │
-│  │ - Reads: middleware-file-filter.conf │          │
-│  │ - Sets: MIDDLEWARE_FILES_TO_REMOVE   │          │
-│  └──────────────────────────────────────┘          │
-│                                                     │
-│  ┌──────────────────────────────────────┐          │
-│  │ File Removal (do_rootfs time)        │          │
-│  │ - Function: remove_feature_filtered_files()     │
-│  │ - Removes files from IMAGE_ROOTFS    │          │
+│  │ Validation (do_rootfs time)          │          │
+│  │ - Function: validate_package_filtering()        │
+│  │ - Warns if excluded packages found  │          │
 │  └──────────────────────────────────────┘          │
 └────────────────────────────────────────────────────┘
          |
@@ -84,49 +77,7 @@ IMAGE (rdk-fullstack-image.bb)
 - No other packages depend on it (runtime)
 - Want to save image space and avoid installation entirely
 
-## File-Level Filtering
-
-### How It Works
-
-1. **Configuration** ([conf/middleware-file-filter.conf](conf/middleware-file-filter.conf))
-   ```bitbake
-   # Feature name: motiondetector
-   MIDDLEWARE_FILE_FILTER_motiondetector = "motion_detector"
-   MIDDLEWARE_FILE_FILTER_motiondetector_FILES = " \
-       /usr/lib/wpeframework/plugins/libWPEFrameworkMotionDetection.so* \
-       /etc/WPEFramework/plugins/MotionDetection.json \
-       /usr/share/WPEFramework/MotionDetection/* \
-   "
-   
-   MIDDLEWARE_FILE_FILTER_FEATURES = "motiondetector"
-   ```
-
-2. **Processing** (Anonymous Python function + shell function)
-   - **Parse time**: Builds list of file patterns to remove
-   - **Rootfs time**: `remove_feature_filtered_files()` shell function executes
-   - Removes files from `${IMAGE_ROOTFS}` based on patterns
-
-3. **Execution** (During `do_rootfs` task)
-   ```bash
-   ROOTFS_POSTPROCESS_COMMAND += "remove_feature_filtered_files; "
-   ```
-
-### File Pattern Support
-
-- **Exact paths**: `/etc/WPEFramework/plugins/MotionDetection.json`
-- **Wildcards**: `/usr/lib/wpeframework/plugins/libWPEFrameworkMotionDetection.so*`
-  - Uses `find` with `-path` for pattern matching
-- **Directories**: `/usr/share/WPEFramework/MotionDetection/*`
-  - Removes all files in directory
-
-### When to Use File Filtering
-
-- IPK contains both required and optional files
-- Cannot exclude entire package (has dependencies)
-- Want to remove specific plugins/configs from multi-component package
-- Package is already installed but contains feature-specific files
-
-## Configuration Files
+## Configuration File
 
 ### middleware-feature-mapping.conf
 
@@ -163,59 +114,15 @@ MIDDLEWARE_AVAILABLE_FEATURES = " \
 "
 ```
 
-### middleware-file-filter.conf
-
-Location: `meta-rdk-images/conf/middleware-file-filter.conf`
-
-**Format:**
-```bitbake
-# Define the DISTRO_FEATURE required for this file group
-MIDDLEWARE_FILE_FILTER_<feature_name> = "distro_feature_name"
-
-# List file patterns to remove if feature is disabled
-MIDDLEWARE_FILE_FILTER_<feature_name>_FILES = " \
-    /path/to/file1 \
-    /path/to/wildcard* \
-    /path/to/dir/* \
-"
-
-# Register the file filter (space-separated list)
-MIDDLEWARE_FILE_FILTER_FEATURES = " \
-    <feature_name> \
-"
-```
-
-**Example - Adding HDR filtering:**
-```bitbake
-MIDDLEWARE_FILE_FILTER_hdr = "enable_hdr"
-MIDDLEWARE_FILE_FILTER_hdr_FILES = " \
-    /usr/lib/wpeframework/plugins/libWPEFrameworkHDR.so* \
-    /etc/WPEFramework/plugins/HDR.json \
-"
-
-MIDDLEWARE_FILE_FILTER_FEATURES = " \
-    motiondetector \
-    hdr \
-"
-```
-
 ## Adding New Filters
 
-### Step 1: Identify What to Filter
+### Step 1: Identify the Package
 
-**For Package-Level:**
 - Identify the IPK package name
-- Verify it's listed as `RRECOMMENDS` in packagegroup
-- Choose a meaningful `DISTRO_FEATURE` name
-
-**For File-Level:**
-- Find files in rootfs that should be conditional
-- Determine file patterns (exact paths or wildcards)
+- Verify it's listed as `RRECOMMENDS` in the packagegroup
 - Choose a meaningful `DISTRO_FEATURE` name
 
 ### Step 2: Update Configuration
-
-**For Package-Level Filtering:**
 
 Edit `meta-rdk-images/conf/middleware-feature-mapping.conf`:
 ```bitbake
@@ -232,40 +139,22 @@ MIDDLEWARE_AVAILABLE_FEATURES = " \
 "
 ```
 
-**For File-Level Filtering:**
-
-Edit `meta-rdk-images/conf/middleware-file-filter.conf`:
-```bitbake
-# Add file filter definition
-MIDDLEWARE_FILE_FILTER_myfeature = "enable_myfeature"
-MIDDLEWARE_FILE_FILTER_myfeature_FILES = " \
-    /path/to/files/* \
-"
-
-# Update the filter list
-MIDDLEWARE_FILE_FILTER_FEATURES = " \
-    motiondetector \
-    myfeature \
-"
-```
-
 ### Step 3: Configure Product
 
 Edit your product configuration (e.g., `product.inc`):
 
-**To ENABLE the feature (keep packages/files):**
+**To ENABLE the feature (keep package):**
 ```bitbake
 DISTRO_FEATURES += "enable_myfeature"
 ```
 
-**To DISABLE the feature (remove packages/files):**
+**To DISABLE the feature (exclude package):**
 ```bitbake
 # Simply omit the DISTRO_FEATURE - filtering happens automatically
 ```
 
 ### Step 4: Test
 
-**Package filtering test:**
 ```bash
 # Check what will be excluded
 bitbake-getvar -r rdk-fullstack-image MIDDLEWARE_PACKAGES_TO_EXCLUDE
@@ -273,16 +162,6 @@ bitbake-getvar -r rdk-fullstack-image MIDDLEWARE_PACKAGES_TO_EXCLUDE
 # Build and verify package is not in image
 bitbake rdk-fullstack-image
 ls tmp-debug/work/*/rdk-fullstack-image/*/rootfs/ | grep my-package
-```
-
-**File filtering test:**
-```bash
-# Check what files will be removed
-bitbake-getvar -r rdk-fullstack-image MIDDLEWARE_FILES_TO_REMOVE
-
-# Build and verify files are removed
-bitbake rdk-fullstack-image
-find tmp-debug/work/*/rdk-fullstack-image/*/rootfs/ -name "myfile*"
 ```
 
 ## Examples
@@ -303,26 +182,7 @@ find tmp-debug/work/*/rdk-fullstack-image/*/rootfs/ -name "myfile*"
 - `nuanceeve` package not installed
 - BAD_RECOMMENDATIONS prevents download and installation
 
-### Example 2: Remove Motion Detector
-
-**Goal**: Remove motion detection plugin files when not needed
-
-**Configuration**: Already configured in middleware-file-filter.conf
-
-**To disable:**
-```bitbake
-# In product.inc - omit:
-# DISTRO_FEATURES += "motion_detector"
-```
-
-**Result**: 
-- Files removed during rootfs post-processing:
-  - `/usr/lib/wpeframework/plugins/libWPEFrameworkMotionDetection.so*`
-  - `/etc/WPEFramework/plugins/MotionDetection.json`
-  - `/usr/share/WPEFramework/MotionDetection/*`
-- Empty directories cleaned up
-
-### Example 3: Add YouTube Filtering
+### Example 2: Add YouTube Filtering
 
 **Scenario**: YouTube plugin should only be installed on devices with `enable_youtube` flag
 
@@ -359,9 +219,6 @@ DISTRO_FEATURES += "enable_youtube"
 # See what packages will be excluded
 bitbake-getvar -r rdk-fullstack-image MIDDLEWARE_PACKAGES_TO_EXCLUDE
 
-# See what files will be removed
-bitbake-getvar -r rdk-fullstack-image MIDDLEWARE_FILES_TO_REMOVE
-
 # Check current DISTRO_FEATURES
 bitbake-getvar -r rdk-fullstack-image DISTRO_FEATURES
 ```
@@ -370,28 +227,11 @@ bitbake-getvar -r rdk-fullstack-image DISTRO_FEATURES
 
 Look for filtering messages in build output:
 
-**Package filtering:**
 ```
 NOTE: === Middleware Feature Filtering ===
 NOTE: Available features to filter: nuance
 NOTE: ✓ Feature "nuance" ENABLED (DISTRO_FEATURE "enable_nuance" present)
 NOTE: === No packages to exclude ===
-```
-
-**File filtering:**
-```
-NOTE: === Middleware File Filtering ===
-NOTE: Available file filter features: motiondetector
-NOTE: ✗ File filter "motiondetector" REMOVING files (DISTRO_FEATURE "motion_detector" missing)
-NOTE: === Files marked for removal: 3 patterns ===
-```
-
-**Rootfs processing:**
-```
-NOTE: === Starting feature-based file removal ===
-NOTE: Files to remove: /usr/lib/wpeframework/plugins/libWPEFrameworkMotionDetection.so*
-NOTE:   Removed files matching: /usr/lib/wpeframework/plugins/libWPEFrameworkMotionDetection.so*
-NOTE: === Feature-filtered file removal complete ===
 ```
 
 ### Common Issues
@@ -403,11 +243,6 @@ NOTE: === Feature-filtered file removal complete ===
 - Another package may have hard dependency
 - **Solution**: Check the warning message for specific instructions
 
-**Files not removed:**
-- Check file paths are correct (leading `/`)
-- Verify `DISTRO_FEATURE` is actually missing
-- Check `ROOTFS_POSTPROCESS_COMMAND` includes removal function
-
 ## Implementation Details
 
 ### Class: rdk-assembler-post-rootfs-hooks.bbclass
@@ -415,10 +250,9 @@ NOTE: === Feature-filtered file removal complete ===
 **Location**: `meta-rdk-images/classes/rdk-assembler-post-rootfs-hooks.bbclass`
 
 **Components**:
-1. Two anonymous Python functions (run at parse time)
+1. Anonymous Python function (run at parse time) - sets `MIDDLEWARE_PACKAGES_TO_EXCLUDE`
 2. Validation function `validate_package_filtering()` (run at rootfs time)
-3. Shell function `remove_feature_filtered_files()` (run at rootfs time)
-4. ROOTFS_POSTPROCESS_COMMAND registration
+3. ROOTFS_POSTPROCESS_COMMAND registration
 
 **Inherited by**: `rdk-fullstack-image.bb`
 
@@ -426,9 +260,9 @@ NOTE: === Feature-filtered file removal complete ===
 
 1. **Parse Phase** (bitbake parsing)
    - Image recipe inherits `rdk-assembler-post-rootfs-hooks`
-   - Configuration files loaded
-   - Anonymous Python functions execute
-   - Variables set: `MIDDLEWARE_PACKAGES_TO_EXCLUDE`, `MIDDLEWARE_FILES_TO_REMOVE`
+   - Configuration file loaded
+   - Anonymous Python function executes
+   - Variable set: `MIDDLEWARE_PACKAGES_TO_EXCLUDE`
 
 2. **Package Installation** (do_rootfs task)
    - `BAD_RECOMMENDATIONS` prevents unwanted packages
@@ -436,10 +270,7 @@ NOTE: === Feature-filtered file removal complete ===
 
 3. **Rootfs Post-Processing** (do_rootfs task)
    - `ROOTFS_POSTPROCESS_COMMAND` executes
-   - **`validate_package_filtering()`** runs first - validates exclusions worked
-   - `remove_feature_filtered_files()` runs
-   - Files removed from `${IMAGE_ROOTFS}`
-   - Empty directories cleaned up
+   - **`validate_package_filtering()`** runs - warns if excluded packages are still present
 
 ## Validation
 
@@ -477,19 +308,14 @@ WARNING: ================================================
 **How to fix:**
 1. Search for the package in all packagegroup recipes
 2. Change `RDEPENDS` to `RRECOMMENDS` for optional packages
-3. If package is truly required by other packages, consider file-level filtering instead
 
 ## Best Practices
 
 1. **Naming Conventions**
-   - Feature names: lowercase, descriptive (e.g., `nuance`, `motiondetector`)
+   - Feature names: lowercase, descriptive (e.g., `nuance`, `youtube`)
    - DISTRO_FEATURES: prefix with `enable_` (e.g., `enable_nuance`)
 
-2. **Package vs File Filtering**
-   - Prefer package-level filtering when possible (cleaner, faster)
-   - Use file filtering only when package contains mixed content
-
-3. **Testing**
+2. **Testing**
    - Always test with feature both enabled and disabled
    - Verify image boots and functions correctly
    - Check image size reduction meets expectations
@@ -503,7 +329,6 @@ WARNING: ================================================
 
 - `meta-rdk-images/classes/rdk-assembler-post-rootfs-hooks.bbclass` - Main implementation
 - `meta-rdk-images/conf/middleware-feature-mapping.conf` - Package filtering config
-- `meta-rdk-images/conf/middleware-file-filter.conf` - File filtering config
 - `meta-rdk-images/recipes-images/rdk-fullstack-image.bb` - Image recipe
 - `meta-middleware-release/recipes-middleware/packagegroup-middleware-layer.bb` - Package group
 
