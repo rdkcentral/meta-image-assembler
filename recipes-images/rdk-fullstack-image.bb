@@ -26,6 +26,7 @@ ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-variant', 'wpeframework_binding_patch; ', '', d)}"
+ROOTFS_POSTPROCESS_COMMAND:append = "legacy_entos_support_patch;"
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
@@ -50,6 +51,28 @@ dobby_generic_config_patch(){
         fi
     fi
 }
+
+# Vendor provided scripts,properies file will be used if found Else used from Middleware
+legacy_entos_support_patch(){
+    if [ -f "${IMAGE_ROOTFS}${sysconfdir}/common.properties" ]; then
+        rm -f ${IMAGE_ROOTFS}${sysconfdir}/common-generic.properties
+    else
+        mv ${IMAGE_ROOTFS}/${sysconfdir}/common-generic.properties ${IMAGE_ROOTFS}/${sysconfdir}/common.properties
+    fi
+    
+    if [ -f "${IMAGE_ROOTFS}/lib/rdk/imageFlasher.sh" ]; then
+        rm -f ${IMAGE_ROOTFS}/lib/rdk/imageFlasher_generic.sh
+    else
+        mv ${IMAGE_ROOTFS}/lib/rdk/imageFlasher_generic.sh ${IMAGE_ROOTFS}/lib/rdk/imageFlasher.sh
+    fi
+
+    if [ -f "${IMAGE_ROOTFS}/lib/rdk/init-zram.sh" ]; then
+        rm -f ${IMAGE_ROOTFS}/lib/rdk/init-zram_generic.sh
+    else
+        mv ${IMAGE_ROOTFS}/lib/rdk/init-zram_generic.sh ${IMAGE_ROOTFS}/lib/rdk/init-zram.sh
+    fi    
+}
+
 
 wpeframework_binding_patch(){
     sed -i "s/127.0.0.1/0.0.0.0/g" ${IMAGE_ROOTFS}/etc/WPEFramework/config.json
