@@ -7,6 +7,7 @@ BBPATH = "${TOPDIR}"
 BBFILES ?= ""
 RDKROOT := "${@os.path.abspath(os.path.dirname(d.getVar('FILE', True)) + '/../..')}"
 MW_LAYER_BUILD_TYPE ?= "MW_FEED"
+OSS_LAYER_BUILD_TYPE ?= "OSS_FEED"
 include manifest_vars.conf
 
 BBLAYERS ?= " \
@@ -67,3 +68,15 @@ BBLAYERS =+ " \
        ${@d.getVar('MANIFEST_PATH_MEDIARITE') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_MEDIARITE') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MEDIARITE') + '/conf/layer.conf')  else ''} \
        ${@d.getVar('MANIFEST_PATH_RDK_CPC_HALIF_HEADERS') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_CPC_HALIF_HEADERS') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_CPC_HALIF_HEADERS') + '/conf/layer.conf')  else ''} \
        "
+
+#OSS vendor release feed
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_OSS_VENDOR_RELEASE') if d.getVar('OSS_LAYER_BUILD_TYPE') != 'OSS_DEV' and d.getVar('MANIFEST_PATH_OSS_VENDOR_RELEASE') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_OSS_VENDOR_RELEASE') + '/conf/layer.conf') else ''}"
+
+#OSS development layers - vendor OSS built from source
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_OSS_VENDOR') if d.getVar('OSS_LAYER_BUILD_TYPE') == 'OSS_DEV' and d.getVar('MANIFEST_PATH_OSS_VENDOR') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_OSS_VENDOR') + '/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_BSP') if d.getVar('OSS_LAYER_BUILD_TYPE') == 'OSS_DEV' and d.getVar('MANIFEST_PATH_BSP') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_BSP') + '/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_SOC') if d.getVar('OSS_LAYER_BUILD_TYPE') == 'OSS_DEV' and d.getVar('MANIFEST_PATH_SOC') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_SOC') + '/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_OSS_DEV_OEM') if d.getVar('OSS_LAYER_BUILD_TYPE') == 'OSS_DEV' and d.getVar('MANIFEST_PATH_OSS_DEV_OEM') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_OSS_DEV_OEM') + '/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_BINDER') if d.getVar('OSS_LAYER_BUILD_TYPE') == 'OSS_DEV' and d.getVar('MANIFEST_PATH_BINDER') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_BINDER') + '/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MEDIARITE_VENDOR') if d.getVar('OSS_LAYER_BUILD_TYPE') == 'OSS_DEV' and d.getVar('MANIFEST_PATH_MEDIARITE_VENDOR') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_MEDIARITE_VENDOR') + '/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_CPC_COMMON') if d.getVar('OSS_LAYER_BUILD_TYPE') == 'OSS_DEV' and d.getVar('MANIFEST_PATH_CPC_COMMON') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_CPC_COMMON') + '/conf/layer.conf') else ''}"
