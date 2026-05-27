@@ -26,7 +26,7 @@ ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-variant', 'wpeframework_binding_patch; ', '', d)}"
-ROOTFS_POSTPROCESS_COMMAND:append = "legacy_entos_support_patch;"
+ROOTFS_POSTPROCESS_COMMAND += "legacy_entos_support_patch; "
 
 create_init_link() {
         ln -sf /sbin/init ${IMAGE_ROOTFS}/init
