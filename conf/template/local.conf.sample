@@ -247,6 +247,9 @@ DISTRO_FEATURES += "##DISTRO_CODENAME##"
 MW_LAYER_BUILD_TYPE = "##MW_LAYER_BUILD_TYPE##"
 OSS_LAYER_BUILD_TYPE = "##OSS_LAYER_BUILD_TYPE##"
 
+# Auto-resolve virtual providers from PREFERRED_PROVIDER mappings in OSS_DEV mode
+INHERIT += "${@'oss-dev-virtual-providers' if d.getVar('OSS_LAYER_BUILD_TYPE') == 'OSS_DEV' else ''}"
+
 #require conf/distro/include/##RDK_FLAVOR##.inc
 
 # Prevent AUTOREV from updating SRCREV value until necessary.
