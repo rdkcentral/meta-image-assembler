@@ -1,0 +1,12 @@
+[Unit]
+Description=Setup Core Dump Configuration
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+User=root
+ConditionPathExists=/opt
+ExecStart=/lib/rdk/setup-core-dumps.sh
+
+[Install]
+WantedBy=multi-user.target

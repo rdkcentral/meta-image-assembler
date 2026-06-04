@@ -25,6 +25,8 @@ IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "syst
 ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
+ROOTFS_POSTPROCESS_COMMAND += "setup_core_dumps; "
+ROOTFS_POSTPROCESS_COMMAND += "enable_gst_debug; "
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-variant', 'wpeframework_binding_patch; ', '', d)}"
 
 create_init_link() {
@@ -62,4 +64,26 @@ dobby_generic_config_patch(){
 
 wpeframework_binding_patch(){
     sed -i "s/127.0.0.1/0.0.0.0/g" ${IMAGE_ROOTFS}/etc/WPEFramework/config.json
+}
+
+# Setup core dump configuration
+setup_core_dumps(){
+    mkdir -p ${IMAGE_ROOTFS}/lib/systemd/system
+    mkdir -p ${IMAGE_ROOTFS}/lib/rdk/
+    mkdir -p ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants
+
+    install -m 0644 ${THISDIR}/files/core-dumps-setup.service ${IMAGE_ROOTFS}/lib/systemd/system/
+    install -m 0755 ${THISDIR}/files/setup-core-dumps.sh ${IMAGE_ROOTFS}/lib/rdk/
+
+    # Enable the service to run on boot
+    ln -sf /lib/systemd/system/core-dumps-setup.service ${IMAGE_ROOTFS}/etc/systemd/system/multi-user.target.wants/core-dumps-setup.service
+}
+
+# Enable GST_DEBUG=5 in configuration files
+enable_gst_debug(){
+    # Enable GST_DEBUG=5 in aisettings.json extraEnvVars
+    sed -i '/"apps": {/a\    "extraEnvVars": ["GST_DEBUG=5"],' ${IMAGE_ROOTFS}/etc/sky/aisettings.json
+
+    # Enable GST_DEBUG=5 in rialto-config.json environmentVariables
+    sed -i 's/"environmentVariables" : \[/"environmentVariables" : ["GST_DEBUG=5",/' ${IMAGE_ROOTFS}/etc/sky/rialto-config.json
 }
