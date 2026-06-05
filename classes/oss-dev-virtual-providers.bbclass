@@ -1,4 +1,3 @@
-
 # oss-dev-virtual-providers.bbclass
 #
 # When building in OSS_DEV mode (vendor + MW from source), MW recipes
@@ -55,14 +54,19 @@ python () {
     if strip_files:
         d.appendVarFlag('do_install', 'postfuncs', ' oss_dev_strip_duplicate_headers')
 
+    # Collect virtuals first, then sort for deterministic PROVIDES order
+    # (d.keys() iteration is non-deterministic and causes task hash changes)
+    virtuals = []
     for key in d.keys():
         if not key.startswith('PREFERRED_PROVIDER_virtual/'):
             continue
         provider = d.getVar(key)
         if provider == pn:
-            virtual = key.replace('PREFERRED_PROVIDER_', '')
-            # Add build-time provider (for DEPENDS resolution)
-            d.appendVar('PROVIDES', ' ' + virtual)
-            # Add runtime provider (for RDEPENDS resolution)
-            d.appendVar('RPROVIDES:' + pn, ' ' + virtual)
+            virtuals.append(key.replace('PREFERRED_PROVIDER_', ''))
+
+    for virtual in sorted(virtuals):
+        # Add build-time provider (for DEPENDS resolution)
+        d.appendVar('PROVIDES', ' ' + virtual)
+        # Add runtime provider (for RDEPENDS resolution)
+        d.appendVar('RPROVIDES:' + pn, ' ' + virtual)
 }
