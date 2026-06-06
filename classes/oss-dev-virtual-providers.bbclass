@@ -44,6 +44,10 @@ python () {
         d.setVarFlag('do_install', 'noexec', '1')
         d.setVar('SYSTEMD_SERVICE:' + pn, '')
         d.setVar('INITSCRIPT_NAME', '')
+        # Empty do_install means no files in ${D}, so the package would not
+        # be generated without ALLOW_EMPTY — causing rootfs "nothing provides"
+        # errors for anything that RDEPENDS on this recipe.
+        d.setVar('ALLOW_EMPTY:' + pn, '1')
 
     # For MW recipes that install headers also shipped by a halif-headers
     # recipe, strip those headers after do_install so both recipes can
