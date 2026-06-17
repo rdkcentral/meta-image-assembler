@@ -12,45 +12,15 @@ IMAGE_INSTALL = " \
                  packagegroup-middleware-layer \
                  packagegroup-application-layer \
                  "
+# BAD_RECOMMENDATIONS prevents installation of packages that are only RRECOMMENDS
+# this is used to remove packages provided by middleware feed but not needed on the actual product.
+BAD_RECOMMENDATIONS += "${MIDDLEWARE_PACKAGES_TO_EXCLUDE}"
 
 IMAGE_FSTYPES += "ext4 tar.gz"
 IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL:remove = "linux-meson"
 
-inherit core-image custom-rootfs-creation
+inherit core-image custom-rootfs-creation rdk-assembler-post-rootfs-hooks
 
 IMAGE_ROOTFS_SIZE ?= "8192"
 IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "systemd", " + 4096", "" ,d)}"
-
-ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
-ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
-ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
-ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-variant', 'wpeframework_binding_patch; ', '', d)}"
-
-create_init_link() {
-        ln -sf /sbin/init ${IMAGE_ROOTFS}/init
-}
-
-# Required for NetworkManager
-create_NM_link() {
-    touch ${R}/etc/resolv.conf
-    echo "nameserver 127.0.0.1" > ${R}/etc/resolv.conf
-    echo "options timeout:1" >> ${R}/etc/resolv.conf
-    echo "options attempts:2" >> ${R}/etc/resolv.conf
-    ln -sf /var/run/NetworkManager/no-stub-resolv.conf ${R}/etc/resolv.dnsmasq
-}
-
-# If vendor layer provides dobby configuration, then remove the generic config
-dobby_generic_config_patch(){
-    if [ -f "${IMAGE_ROOTFS}/etc/dobby.generic.json" ]; then
-        if [ -f "${IMAGE_ROOTFS}/etc/dobby.json" ]; then
-            rm ${IMAGE_ROOTFS}/etc/dobby.generic.json
-        else
-            mv ${IMAGE_ROOTFS}/etc/dobby.generic.json ${IMAGE_ROOTFS}/etc/dobby.json
-        fi
-    fi
-}
-
-wpeframework_binding_patch(){
-    sed -i "s/127.0.0.1/0.0.0.0/g" ${IMAGE_ROOTFS}/etc/WPEFramework/config.json
-}
