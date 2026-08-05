@@ -36,6 +36,7 @@ BBLAYERS =+ "${@'${MANIFEST_PATH_PRODUCT_LAYER}' if os.path.isfile('${MANIFEST_P
 BBLAYERS =+ "${@'${MANIFEST_PATH_COMMON_CONFIG}' if os.path.isfile('${MANIFEST_PATH_COMMON_CONFIG}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_REGION_CONFIG}' if os.path.isfile('${MANIFEST_PATH_REGION_CONFIG}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@'${MANIFEST_PATH_PROFILE_CONFIG}' if os.path.isfile('${MANIFEST_PATH_PROFILE_CONFIG}/conf/layer.conf') else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_META_MIXIN') if d.getVar('MANIFEST_PATH_META_MIXIN') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_META_MIXIN') + '/conf/layer.conf') else ''}"
 
 # xumotv product layer
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_PRODUCT_XUMOTV_LAYER') if d.getVar('MANIFEST_PATH_PRODUCT_XUMOTV_LAYER') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_PRODUCT_XUMOTV_LAYER') + '/conf/layer.conf') else ''}"
