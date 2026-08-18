@@ -26,6 +26,7 @@ IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "syst
 ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
+ROOTFS_POSTPROCESS_COMMAND += "nxserver_dep; "
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-variant', 'wpeframework_binding_patch; ', '', d)}"
 
 create_init_link() {
@@ -39,6 +40,25 @@ create_NM_link() {
     echo "options timeout:1" >> ${R}/etc/resolv.conf
     echo "options attempts:2" >> ${R}/etc/resolv.conf
     ln -sf /var/run/NetworkManager/no-stub-resolv.conf ${R}/etc/resolv.dnsmasq
+}
+
+#NetworkManager service as dependency in nxserver
+nxserver_dep(){
+    nxserver_service="${IMAGE_ROOTFS}/lib/systemd/system/nxserver.service"
+
+    if [ ! -f "${nxserver_service}" ]; then
+        bbfatal "nxserver.service not found at ${nxserver_service}"
+    fi
+
+    sed -i '/^After=NetworkManager\.service$/d;/^Requires=NetworkManager\.service$/d' "${nxserver_service}"
+
+    if ! grep -q '^After=.*NetworkManager\.service' "${nxserver_service}"; then
+        sed -i 's/^After=\(.*\)$/After=\1 NetworkManager.service/' "${nxserver_service}"
+    fi
+
+    if ! grep -q '^Requires=.*NetworkManager\.service' "${nxserver_service}"; then
+        sed -i 's/^Requires=\(.*\)$/Requires=\1 NetworkManager.service/' "${nxserver_service}"
+    fi
 }
 
 # If vendor layer provides dobby configuration, then remove the generic config
