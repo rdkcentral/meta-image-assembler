@@ -22,7 +22,7 @@ BBLAYERS ?= " \
   "
 
 BBLAYERS =+ "${@'${MANIFEST_PATH_COMMON_OSS_REFERENCE}' if os.path.isfile('${MANIFEST_PATH_COMMON_OSS_REFERENCE}/conf/layer.conf') else ''}"
-BBLAYERS =+ "${@'${MANIFEST_PATH_META_RDK_BLUETOOTH}' if os.path.isfile('${MANIFEST_PATH_META_RDK_BLUETOOTH}/conf/layer.conf') else ''}"
+#BBLAYERS =+ "${@'${MANIFEST_PATH_META_RDK_BLUETOOTH}' if os.path.isfile('${MANIFEST_PATH_META_RDK_BLUETOOTH}/conf/layer.conf') else ''}"
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_OSS_RELEASE') if d.getVar('MANIFEST_PATH_OSS_RELEASE') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_OSS_RELEASE') + '/conf/layer.conf') else ''}"
 
 BBLAYERS =+ "${@'${MANIFEST_PATH_RDK_TOOLS}' if os.path.isfile('${MANIFEST_PATH_RDK_TOOLS}/conf/layer.conf') else ''}"
@@ -60,6 +60,8 @@ BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_META_PYTHON2') if d.getVar('MW_LAYER_BUI
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_RDK_SKY') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_SKY') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_SKY') + '/conf/layer.conf')  else ''}"
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_META_MIXIN') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_META_MIXIN') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_META_MIXIN') + '/conf/layer.conf')  else ''}"
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_META_CLANG') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_META_CLANG') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_META_CLANG') + '/conf/layer.conf')  else ''}"
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_META_RDK_BLUETOOTH') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_META_RDK_BLUETOOTH') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_META_RDK_BLUETOOTH') + '/conf/layer.conf')  else ''}"
+
 
 # Middleware layers: restricted/proprietary
 BBLAYERS =+ " \
