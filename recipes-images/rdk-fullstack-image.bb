@@ -18,7 +18,7 @@ IMAGE_INSTALL += "volatile-binds"
 IMAGE_INSTALL:remove = "linux-meson"
 
 inherit core-image custom-rootfs-creation
-inherit manifest-srcuri
+#inherit manifest-srcuri
 inherit extract-sha256-cve
 
 
