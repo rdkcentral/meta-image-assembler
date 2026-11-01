@@ -28,6 +28,7 @@ IMAGE_ROOTFS_EXTRA_SPACE:append = "${@bb.utils.contains("DISTRO_FEATURES", "syst
 ROOTFS_POSTPROCESS_COMMAND += "dobby_generic_config_patch; "
 ROOTFS_POSTPROCESS_COMMAND += "create_NM_link; "
 ROOTFS_POSTPROCESS_COMMAND += "create_init_link; "
+ROOTFS_POSTPROCESS_COMMAND += "rdkwindowmanager_dep; "
 ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('DISTRO_FEATURES', 'debug-variant', 'wpeframework_binding_patch; ', '', d)}"
 
 create_init_link() {
@@ -52,6 +53,16 @@ dobby_generic_config_patch(){
             mv ${IMAGE_ROOTFS}/etc/dobby.generic.json ${IMAGE_ROOTFS}/etc/dobby.json
         fi
     fi
+}
+
+rdkwindowmanager_dep(){
+    install -d ${D}/etc/systemd/system/wpeframework-rdkwindowmanager.service.d
+    cat > ${D}/etc/systemd/system/wpeframework-rdkwindowmanager.service.d/realtek.conf <<'EOF'
+
+[Service]
+Environment="LD_PRELOAD=/usr/lib/libwayland-egl.so.0"
+ExecStartPre=-/bin/sh -c 'if [ -f /usr/bin/manage_splash.sh ];then /usr/bin/manage_splash.sh stop; fi'
+EOF
 }
 
 wpeframework_binding_patch(){
