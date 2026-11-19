@@ -41,10 +41,10 @@ BBLAYERS =+ "${@'${MANIFEST_PATH_PROFILE_CONFIG}' if os.path.isfile('${MANIFEST_
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_PRODUCT_XUMOTV_LAYER') if d.getVar('MANIFEST_PATH_PRODUCT_XUMOTV_LAYER') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_PRODUCT_XUMOTV_LAYER') + '/conf/layer.conf') else ''}"
 
 #Middleware release feed
-BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MW_RELEASE') if d.getVar('MW_LAYER_BUILD_TYPE') != 'MW_DEV' and d.getVar('MANIFEST_PATH_MW_RELEASE') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MW_RELEASE') + '/conf/layer.conf')  else ''}"
+#BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MW_RELEASE') if d.getVar('MW_LAYER_BUILD_TYPE') != 'MW_DEV' and d.getVar('MANIFEST_PATH_MW_RELEASE') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MW_RELEASE') + '/conf/layer.conf')  else ''}"
 
-#Middleware: Include bbclass files
-BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MW_RELEASE') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_MW_RELEASE') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MW_RELEASE') + '/conf/include/image-classes.inc')  else ''}"
+#Middleware release layer: always enabled for its image classes; IPK feed is gated in middleware.inc
+BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MW_RELEASE') if d.getVar('MANIFEST_PATH_MW_RELEASE') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_MW_RELEASE') + '/conf/layer.conf') else ''}"
 
 #Middleware development layer - halif headers
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_RDK_HALIF_HEADERS') if d.getVar('MW_LAYER_BUILD_TYPE') == 'MW_DEV' and d.getVar('MANIFEST_PATH_RDK_HALIF_HEADERS') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_RDK_HALIF_HEADERS') + '/conf/layer.conf')  else ''}"
