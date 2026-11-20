@@ -41,9 +41,6 @@ BBLAYERS =+ "${@'${MANIFEST_PATH_PROFILE_CONFIG}' if os.path.isfile('${MANIFEST_
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_PRODUCT_XUMOTV_LAYER') if d.getVar('MANIFEST_PATH_PRODUCT_XUMOTV_LAYER') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_PRODUCT_XUMOTV_LAYER') + '/conf/layer.conf') else ''}"
 
 #Middleware release feed
-#BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MW_RELEASE') if d.getVar('MW_LAYER_BUILD_TYPE') != 'MW_DEV' and d.getVar('MANIFEST_PATH_MW_RELEASE') is not None and  os.path.isfile(d.getVar('MANIFEST_PATH_MW_RELEASE') + '/conf/layer.conf')  else ''}"
-
-#Middleware release layer: always enabled for its image classes; IPK feed is gated in middleware.inc
 BBLAYERS =+ "${@d.getVar('MANIFEST_PATH_MW_RELEASE') if d.getVar('MANIFEST_PATH_MW_RELEASE') is not None and os.path.isfile(d.getVar('MANIFEST_PATH_MW_RELEASE') + '/conf/layer.conf') else ''}"
 
 #Middleware development layer - halif headers
